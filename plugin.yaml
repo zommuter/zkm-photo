@@ -1,0 +1,14 @@
+name: zkm-photo
+version: 0.1.0
+description: Import JPEG photos into the knowledge store. EXIF date/GPS/camera → frontmatter; raw bytes → CAS; sha256 dedup.
+
+creates_dirs:
+  - photos
+  - originals/photos
+  - inbox
+
+config:
+  PHOTO_SOURCE_DIR:
+    required: true
+    default: ""
+    description: Directory to scan recursively for JPEG files (.jpg/.jpeg). Read-only.
