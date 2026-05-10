@@ -10,7 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "exifread>=3.0",
     "python-frontmatter>=1.1",
-    "zkm",
+    "zkm>=0.2.0,<0.3.0",
 ]
 
 [project.optional-dependencies]
