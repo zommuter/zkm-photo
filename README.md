@@ -56,7 +56,7 @@ uv run pytest -q
 # Wire into zkm and test:
 cd ~/src/zkm
 uv run zkm plugin add ~/src/zkm-photo
-PHOTO_SOURCE_DIR=~/Pictures ZKM_STORE=~/knowledge uv run zkm convert zkm-photo
+PHOTO_SOURCE_DIR=~/Pictures ZKM_STORE=~/knowledge uv run zkm convert photo
 ```
 
 Note: `exifread` must also be installed in the zkm runtime environment. Add it to the shared venv if running through `zkm convert`.
