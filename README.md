@@ -1,10 +1,8 @@
 # zkm-photo
 
-zkm plugin that imports JPEG photos into the knowledge store. EXIF metadata (date, GPS, camera model, dimensions) is parsed into frontmatter; the original bytes go into the content-addressed store; a symlink lands in `inbox/photos/` for other plugins.
+[zkm](https://github.com/zommuter/zkm) plugin that imports JPEG photos into the knowledge store. EXIF metadata (date, GPS, camera model, dimensions) is parsed into frontmatter; the original bytes go into the content-addressed store; a symlink lands in `inbox/photos/` for other plugins.
 
-**Repo**: `~/src/zkm-photo/`  
-**Store dirs**: `photos/`, `originals/photos/`, `inbox/photos/`  
-**Install**: `zkm plugin add ~/src/zkm-photo`
+**Store dirs**: `photos/`, `originals/photos/`, `inbox/photos/`
 
 ## What it does
 
@@ -38,6 +36,14 @@ Body is a markdown image link pointing at the CAS object, plus a one-line EXIF s
 - No thumbnail generation, no face detection, no OCR, no GPS reverse-geocoding (Phase 3)
 - `tags: []` left empty as amendment placeholder; `camera` scalar carries raw model string
 
+## Install
+
+Clone this repo inside your zkm `plugins/` directory:
+
+```bash
+git clone https://github.com/zommuter/zkm-photo.git plugins/zkm-photo
+```
+
 ## Configuration
 
 | Variable | Required | Default | Description |
@@ -49,17 +55,12 @@ Set in `$ZKM_STORE/.env` or as an environment variable.
 ## Development
 
 ```bash
-cd ~/src/zkm-photo
+cd plugins/zkm-photo
 uv sync --extra dev
 uv run pytest -q
-
-# Wire into zkm and test:
-cd ~/src/zkm
-uv run zkm plugin add ~/src/zkm-photo
-PHOTO_SOURCE_DIR=~/Pictures ZKM_STORE=~/knowledge uv run zkm convert photo
 ```
 
-Note: `exifread` must also be installed in the zkm runtime environment. Add it to the shared venv if running through `zkm convert`.
+Note: `exifread` must also be installed in the zkm runtime environment.
 
 ## Tests
 
@@ -76,3 +77,7 @@ All test fixtures are **synthetic** — no real photos. Run `tests/build_fixture
 - `test_convert_path_collision_suffix` — same date+slug → `_1` suffix on second file
 - `test_convert_canonical_inbox_symlink` — symlink points at CAS, sidecar has `photo` producer
 - `test_convert_multi_producer_sidecar` — JPEG pre-seeded by `zkm-eml` gains second producer entry
+
+## License
+
+MIT — see [LICENSE](LICENSE)

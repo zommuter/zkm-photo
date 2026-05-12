@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "zkm-photo"
 version = "0.2.0"
 description = "zkm plugin: import JPEG photos into the knowledge store via EXIF metadata"
+license = "MIT"
 requires-python = ">=3.14"
 dependencies = [
     "exifread>=3.0",
