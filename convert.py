@@ -32,9 +32,9 @@ def convert(store_path: Path, config: dict, *, progress=None) -> list[Path]:
     Returns a list of paths to newly created .md files.
     progress: optional callback(current, total, message).
     """
-    src = Path(config["PHOTO_SOURCE_DIR"]).expanduser().resolve()
+    src = Path(config["source_dir"]).expanduser().resolve()
     if not src.exists():
-        raise FileNotFoundError(f"PHOTO_SOURCE_DIR does not exist: {src}")
+        raise FileNotFoundError(f"source_dir does not exist: {src}")
 
     photos_dir = store_path / "photos"
     photos_dir.mkdir(parents=True, exist_ok=True)
