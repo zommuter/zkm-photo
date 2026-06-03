@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zkm-photo"
-version = "0.3.0"
+version = "0.4.0"
 description = "zkm plugin: import JPEG photos into the knowledge store via EXIF metadata"
 license = "MIT"
 requires-python = ">=3.11"
@@ -35,6 +35,9 @@ dependencies = [
 Homepage = "https://github.com/zommuter/zkm"
 Repository = "https://github.com/zommuter/zkm-photo"
 Issues = "https://github.com/zommuter/zkm-photo/issues"
+
+[project.entry-points."zkm.plugins"]
+photo = "zkm_photo"
 
 [project.optional-dependencies]
 dev = [
