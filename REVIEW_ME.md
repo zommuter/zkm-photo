@@ -1,0 +1,33 @@
+# Human review queue <!-- budget: 15 min -->
+
+Judgment calls encoded in red tests — confirm or correct the interpretation.
+Max ~10 open boxes; the reviewer prunes resolved ones each review turn.
+
+- [ ] tests/test_timezone_conformance.py::test_exif_date_without_offset_gets_local_tz
+  (roadmap:33e5) — EXIF dates carry no timezone; when no Offset* tag exists the
+  test assumes the SYSTEM LOCAL timezone (matching the existing mtime-fallback
+  policy). Alternatives: a per-store configured tz, or staying naive (which
+  permanently fails core conformance). Wrong for photos taken while travelling.
+
+- [ ] tests/test_formats.py::test_heic_ingested_with_mtime_fallback
+  (roadmap:4514) — HEIC v1 is interpreted as "ingest with graceful EXIF
+  degradation": the committed fixture is a placeholder ftyp box, so the unit
+  test only proves the no-crash/mtime path. Real-camera HEIC EXIF extraction is
+  deferred to the @manual BDD scenario (features/convert-photo.feature). Confirm
+  that placeholder-grade coverage is acceptable for ticking the item.
+
+- [ ] tests/test_formats.py::test_png_ingested_with_ihdr_dimensions
+  (roadmap:8643) — PNG dimensions specced from stdlib IHDR parsing (no Pillow
+  runtime dep) and date from mtime, since PNG eXIf chunks are rare. exifread is
+  still attempted first, so an eXIf-bearing PNG would win — confirm that
+  precedence.
+
+- [ ] tests/test_convert.py::test_convert_skips_non_image (rescoped at handoff)
+  — the old test asserted .png files are SKIPPED; ingesting them is now
+  roadmap:8643, so the skip-assertion was narrowed to .gif/.txt. Confirm the
+  scope flip from "JPEG-only forever" to "JPEG now, PNG/TIFF/HEIC as items".
+
+- [ ] ARCHITECTURE.md D4 (no test) — zkm-photo creates FLAT inbox/photos/<name>
+  symlinks while core docs/object-storage.md shows date-sharded
+  inbox/<subdir>/YYYY/MM/ (zkm-eml's layout). Documented as an accepted
+  deviation; one-time ack requested, or file a re-shard item.

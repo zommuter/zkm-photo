@@ -6,7 +6,7 @@
 
 ## What it does
 
-For each `.jpg`/`.jpeg` file found under `PHOTO_SOURCE_DIR`:
+For each `.jpg`/`.jpeg` file found under the configured `source_dir`:
 
 1. Computes SHA-256; skips if already ingested (idempotent on re-run).
 2. Stores raw bytes in CAS at `originals/photos/_objects/<aa>/<rest>`.
@@ -16,7 +16,7 @@ For each `.jpg`/`.jpeg` file found under `PHOTO_SOURCE_DIR`:
 ```yaml
 source: photo
 processor: photo
-processor_version: 0.1.0
+processor_version: <plugin semver>
 date: 2024-08-15T12:30:00
 tags: []                         # placeholder — future amenders may extend
 sha256: e5207343…
@@ -38,7 +38,13 @@ Body is a markdown image link pointing at the CAS object, plus a one-line EXIF s
 
 ## Install
 
-Clone this repo inside your zkm `plugins/` directory:
+End users (released wheel, sealed uv env):
+
+```bash
+uv tool install zkm --with zkm-photo
+```
+
+Development (filesystem discovery — clone inside your zkm `plugins/` directory):
 
 ```bash
 git clone https://github.com/zommuter/zkm-photo.git plugins/zkm-photo
@@ -46,11 +52,11 @@ git clone https://github.com/zommuter/zkm-photo.git plugins/zkm-photo
 
 ## Configuration
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `PHOTO_SOURCE_DIR` | yes | — | Directory scanned recursively for JPEGs (read-only) |
+Bare snake_case keys under the `photo:` section of `$ZKM_STORE/zkm-config.yaml`:
 
-Set in `$ZKM_STORE/.env` or as an environment variable.
+| Key | Required | Default | Description |
+|---|---|---|---|
+| `source_dir` | yes | — | Directory scanned recursively for JPEGs (read-only) |
 
 ## Development
 
@@ -64,19 +70,16 @@ Note: `exifread` must also be installed in the zkm runtime environment.
 
 ## Tests
 
-All test fixtures are **synthetic** — no real photos. Run `tests/build_fixtures.py` once (needs `Pillow` + `piexif`) to regenerate committed fixture files.
+All test fixtures are **synthetic** — no real photos. Run `tests/build_fixtures.py` (needs `Pillow` + `piexif`, included in the dev extra) to regenerate committed fixture files; the generator is deterministic.
 
-- `test_convert_creates_md_with_frontmatter` — full frontmatter + body check
-- `test_convert_idempotent` — second run returns `[]`, CAS/sidecar unchanged
-- `test_convert_dedup_by_sha256` — two copies of same file → one md + one CAS object
-- `test_convert_no_exif_date_falls_back_to_mtime` — mtime used when DateTimeOriginal absent
-- `test_convert_skips_non_jpeg` — `.png` and `.txt` ignored
-- `test_convert_no_op_on_empty_source` — empty source dir returns `[]`
-- `test_convert_gps_decimal_degrees` — GPS → `"lat,lon"` string, ±0.001° accuracy
-- `test_convert_no_gps_field_when_absent` — no `location` key when EXIF GPS absent
-- `test_convert_path_collision_suffix` — same date+slug → `_1` suffix on second file
-- `test_convert_canonical_inbox_symlink` — symlink points at CAS, sidecar has `photo` producer
-- `test_convert_multi_producer_sidecar` — JPEG pre-seeded by `zkm-eml` gains second producer entry
+`tests/test_convert.py` covers: full frontmatter + body shape, idempotent re-run
+(CAS/sidecar unchanged), sha256 dedup across paths, the EXIF date fallback chain
+(DateTimeOriginal → DateTimeDigitized → mtime), corrupt-EXIF graceful fallback,
+GPS decimal degrees incl. southern/western hemispheres, date+slug collision
+suffixing, the canonical inbox symlink, and multi-producer sidecars (a JPEG
+pre-seeded by `zkm-eml` gains a second producer entry). Additional currently-RED
+spec tests for open roadmap items live in `tests/test_*` files marked with
+`# roadmap:<id>` comments — see `ROADMAP.md`.
 
 ## License
 

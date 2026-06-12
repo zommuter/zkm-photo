@@ -9,38 +9,16 @@ import shutil
 from pathlib import Path
 
 import frontmatter
-import pytest
 
-from convert import PLUGIN_NAME, PLUGIN_VERSION, convert
+from conftest import FIXTURES, cfg
+from zkm_photo.convert import PLUGIN_NAME, PLUGIN_VERSION, convert
 
-FIXTURES = Path(__file__).parent / "fixtures"
 CANON = FIXTURES / "canon_2024.jpg"
 NOGPS = FIXTURES / "nogps_2023.jpg"
 NODATE = FIXTURES / "nodate.jpg"
-
-
-@pytest.fixture
-def store(tmp_path: Path) -> Path:
-    """Minimal zkm store skeleton."""
-    s = tmp_path / "store"
-    (s / "photos").mkdir(parents=True)
-    (s / "inbox").mkdir()
-    (s / "originals" / "photos").mkdir(parents=True)
-    import subprocess
-    subprocess.run(["git", "init", "-q", str(s)], check=True)
-    return s
-
-
-@pytest.fixture
-def src(tmp_path: Path) -> Path:
-    """Clean PHOTO_SOURCE_DIR."""
-    d = tmp_path / "photos_src"
-    d.mkdir()
-    return d
-
-
-def cfg(src: Path) -> dict:
-    return {"PHOTO_SOURCE_DIR": str(src)}
+GPS_SW = FIXTURES / "gps_sw_2022.jpg"
+DIGITIZED = FIXTURES / "digitized_2021.jpg"
+CORRUPT = FIXTURES / "corrupt_exif.jpg"
 
 
 # ── 1. Happy path ─────────────────────────────────────────────────────────────
@@ -58,7 +36,8 @@ def test_convert_creates_md_with_frontmatter(store, src):
     post = frontmatter.load(md)
     assert post.metadata["source"] == PLUGIN_NAME
     assert post.metadata["processor_version"] == PLUGIN_VERSION
-    assert post.metadata["date"] == "2024-08-15T12:30:00"
+    # startswith, not ==: roadmap:33e5 adds a timezone suffix to EXIF dates
+    assert post.metadata["date"].startswith("2024-08-15T12:30:00")
     assert post.metadata["tags"] == []
     assert isinstance(post.metadata["sha256"], str) and len(post.metadata["sha256"]) == 64
     assert post.metadata["original"].startswith("originals/photos/_objects/")
@@ -120,11 +99,13 @@ def test_convert_no_exif_date_falls_back_to_mtime(store, src):
     assert date_str.startswith("2023-")
 
 
-# ── 5. Non-JPEG files are skipped ─────────────────────────────────────────────
+# ── 5. Non-image files are skipped ────────────────────────────────────────────
 
-def test_convert_skips_non_jpeg(store, src):
+def test_convert_skips_non_image(store, src):
+    # NOTE: .png/.tif/.heic deliberately NOT asserted as skipped here —
+    # ingesting them is roadmap work (roadmap:8643/62ea/4514).
     shutil.copy(CANON, src / "photo.jpg")
-    (src / "thumbnail.png").write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100)
+    (src / "clip.gif").write_bytes(b"GIF89a" + b"\x00" * 64)
     (src / "readme.txt").write_text("ignore me")
     created = convert(store, cfg(src))
     assert len(created) == 1  # only the .jpg
@@ -205,7 +186,7 @@ def test_convert_canonical_inbox_symlink(store, src):
 def test_convert_multi_producer_sidecar(store, src):
     """A JPEG pre-seeded by zkm-eml gets a second producer entry from zkm-photo."""
     from zkm.cas import write_object
-    from zkm.inbox import build_canonical_index, symlink_with_sidecar
+    from zkm.inbox import symlink_with_sidecar
 
     photo_bytes = CANON.read_bytes()
     # Simulate zkm-eml depositing the same bytes into CAS and inbox/photos
@@ -241,3 +222,36 @@ def test_convert_multi_producer_sidecar(store, src):
     assert len(symlinks) == 1
     cas_files = list((store / "originals" / "photos" / "_objects").rglob("*"))
     assert sum(1 for f in cas_files if f.is_file()) == 1
+
+
+# ── 11. EXIF edge-case regressions (verified green at handoff, kept as guards) ─
+
+def test_convert_gps_southern_western_hemisphere(store, src):
+    """S/W hemisphere refs produce negative decimal degrees."""
+    shutil.copy(GPS_SW, src / "buenos_aires.jpg")
+    created = convert(store, cfg(src))
+    assert len(created) == 1
+    post = frontmatter.load(created[0])
+    lat, lon = map(float, post.metadata["location"].split(","))
+    assert abs(lat - (-34.6037)) < 0.001
+    assert abs(lon - (-58.3816)) < 0.001
+
+
+def test_convert_date_digitized_fallback(store, src):
+    """DateTimeOriginal absent → DateTimeDigitized is used (fallback-chain step 2)."""
+    shutil.copy(DIGITIZED, src / "digitized.jpg")
+    created = convert(store, cfg(src))
+    assert len(created) == 1
+    post = frontmatter.load(created[0])
+    assert post.metadata["date"].startswith("2021-06-01T08:00:00")
+
+
+def test_convert_corrupt_exif_graceful(store, src):
+    """Garbage APP1 segment must not crash convert; date falls back to mtime."""
+    dest = src / "corrupt.jpg"
+    shutil.copy(CORRUPT, dest)
+    os.utime(dest, (1_700_000_000, 1_700_000_000))
+    created = convert(store, cfg(src))
+    assert len(created) == 1
+    post = frontmatter.load(created[0])
+    assert post.metadata["date"].startswith("2023-")
