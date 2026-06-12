@@ -9,41 +9,16 @@ import shutil
 from pathlib import Path
 
 import frontmatter
-import pytest
 
+from conftest import FIXTURES, cfg
 from zkm_photo.convert import PLUGIN_NAME, PLUGIN_VERSION, convert
 
-FIXTURES = Path(__file__).parent / "fixtures"
 CANON = FIXTURES / "canon_2024.jpg"
 NOGPS = FIXTURES / "nogps_2023.jpg"
 NODATE = FIXTURES / "nodate.jpg"
 GPS_SW = FIXTURES / "gps_sw_2022.jpg"
 DIGITIZED = FIXTURES / "digitized_2021.jpg"
 CORRUPT = FIXTURES / "corrupt_exif.jpg"
-
-
-@pytest.fixture
-def store(tmp_path: Path) -> Path:
-    """Minimal zkm store skeleton."""
-    s = tmp_path / "store"
-    (s / "photos").mkdir(parents=True)
-    (s / "inbox").mkdir()
-    (s / "originals" / "photos").mkdir(parents=True)
-    import subprocess
-    subprocess.run(["git", "init", "-q", str(s)], check=True)
-    return s
-
-
-@pytest.fixture
-def src(tmp_path: Path) -> Path:
-    """Clean PHOTO_SOURCE_DIR."""
-    d = tmp_path / "photos_src"
-    d.mkdir()
-    return d
-
-
-def cfg(src: Path) -> dict:
-    return {"source_dir": str(src)}
 
 
 # ── 1. Happy path ─────────────────────────────────────────────────────────────
