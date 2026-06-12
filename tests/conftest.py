@@ -1,5 +1,6 @@
-import sys
-from pathlib import Path
+"""Test config for zkm-photo.
 
-# Allow import of convert.py from repo root (no package install required for tests)
-sys.path.insert(0, str(Path(__file__).parent.parent))
+zkm_photo is installed editable via `uv sync --extra dev`; tests import
+`zkm_photo.convert` directly. The repo-root `convert.py` is only the
+filesystem-discovery shim for zkm core and is not imported by tests.
+"""
