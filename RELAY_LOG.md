@@ -32,3 +32,7 @@ Added `_local_zoneinfo()` helper that resolves the system IANA zone via TZ env v
 `_exif_date_to_iso` now uses the photo's own naive datetime with the ZoneInfo object (not `datetime.now()`) so a Jan capture gets +01:00 and Jul gets +02:00 under Europe/Zurich.
 Added `test_offset_less_exif_date_uses_dst_correct_local_offset` (roadmap:b045) pinning TZ=Europe/Zurich and asserting both offsets. 23/23 tests green, ruff clean.
 Friction: uv sync still fails in worktrees (../.. path); same workaround (main-checkout venv + PYTHONPATH=src).
+
+## 2026-06-13 15:33 — executor (sonnet, relay-loop)
+
+feat(convert): DST-correct per-photo local offset for offset-less EXIF dates (id:b045) — 23/23 green
