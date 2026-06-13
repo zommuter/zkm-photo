@@ -12,6 +12,7 @@ import re
 import struct
 from datetime import UTC, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import exifread
 import frontmatter
@@ -197,6 +198,8 @@ def _exif_date_to_iso(s: str, offset: str | None = None) -> str:
     If *offset* is provided (e.g. "+02:00"), it is appended directly.
     Otherwise the wall-clock time is interpreted as the system local timezone
     (same policy as _mtime_iso) so that the emitted date is always tz-aware.
+    The offset is resolved from the photo's OWN date so that DST is correct
+    per-photo (a Jan photo gets +01:00, a Jul photo +02:00 for Europe/Zurich).
     """
     s = s.strip()
     if not (len(s) >= 19 and s[4] == ":" and s[7] == ":"):
@@ -204,17 +207,45 @@ def _exif_date_to_iso(s: str, offset: str | None = None) -> str:
     iso_base = f"{s[0:4]}-{s[5:7]}-{s[8:10]}T{s[11:19]}"
     if offset:
         return f"{iso_base}{offset}"
-    # No EXIF offset tag — interpret wall-clock as local time, attach local offset
+    # No EXIF offset tag — interpret wall-clock as local time, attach local offset.
+    # Resolve the offset from the photo's own date (DST-correct) using the system
+    # IANA zone rather than the current wall-clock offset.
     try:
         naive = datetime(
             int(s[0:4]), int(s[5:7]), int(s[8:10]),
             int(s[11:13]), int(s[14:16]), int(s[17:19]),
         )
-        local_tz = datetime.now(tz=UTC).astimezone().tzinfo
-        aware = naive.replace(tzinfo=local_tz)
+        local_zone = _local_zoneinfo()
+        aware = naive.replace(tzinfo=local_zone)
         return aware.isoformat(timespec="seconds")
     except (ValueError, OverflowError):
         return iso_base  # malformed — return without tz as last resort
+
+
+def _local_zoneinfo() -> ZoneInfo | datetime.tzinfo:
+    """Return a ZoneInfo for the system local IANA zone, enabling DST-correct offsets.
+
+    Resolution order:
+    1. TZ environment variable (IANA name, e.g. "Europe/Zurich")
+    2. /etc/localtime symlink (Linux / macOS)
+    3. Fallback: fixed offset from datetime.now() (pre-b045 behaviour)
+    """
+    # 1. TZ env var
+    tz_env = os.environ.get("TZ")
+    if tz_env:
+        try:
+            return ZoneInfo(tz_env)
+        except (ZoneInfoNotFoundError, KeyError):
+            pass
+    # 2. /etc/localtime symlink
+    try:
+        link = os.readlink("/etc/localtime")
+        key = link.split("zoneinfo/")[-1]
+        return ZoneInfo(key)
+    except (OSError, ZoneInfoNotFoundError, KeyError):
+        pass
+    # 3. Fallback to fixed local offset (original behaviour; no DST correction)
+    return datetime.now(tz=UTC).astimezone().tzinfo
 
 
 def _parse_gps(tags: dict) -> str | None:

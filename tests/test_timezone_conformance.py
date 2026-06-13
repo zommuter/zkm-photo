@@ -66,3 +66,21 @@ def test_plugin_yaml_declares_conformance_fixtures():
         assert data.get("conformance"), f"{manifest} lacks a conformance block"
         source_dir = data["conformance"]["config"]["source_dir"]
         assert (REPO_ROOT / source_dir).is_dir(), f"{manifest}: {source_dir} not a dir"
+
+
+# ── DST-correct per-photo offset (roadmap:b045) ───────────────────────────────
+
+def test_offset_less_exif_date_uses_dst_correct_local_offset(monkeypatch):
+    # roadmap:b045 — offset resolved from the photo's OWN date, not from now().
+    # Pin the system zone to Europe/Zurich so the test is deterministic.
+    from zkm_photo.convert import _exif_date_to_iso
+
+    monkeypatch.setenv("TZ", "Europe/Zurich")
+
+    # January capture: CET (+01:00)
+    jan_str = _exif_date_to_iso("2024:01:15 12:00:00")
+    assert jan_str.endswith("+01:00"), f"Jan date expected +01:00, got {jan_str!r}"
+
+    # July capture: CEST (+02:00)
+    jul_str = _exif_date_to_iso("2024:07:15 12:00:00")
+    assert jul_str.endswith("+02:00"), f"Jul date expected +02:00, got {jul_str!r}"
