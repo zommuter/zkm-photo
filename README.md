@@ -56,7 +56,7 @@ Bare snake_case keys under the `photo:` section of `$ZKM_STORE/zkm-config.yaml`:
 
 | Key | Required | Default | Description |
 |---|---|---|---|
-| `source_dir` | yes | — | Directory scanned recursively for JPEGs (read-only) |
+| `source_dir` | yes | — | Directory scanned recursively for images (read-only) |
 
 ## Development
 
