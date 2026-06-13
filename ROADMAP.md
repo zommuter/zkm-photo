@@ -71,7 +71,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
     local-tz assumption is a judgment call — see REVIEW_ME.md before changing
     the policy.
 
-- [ ] Per-photo DST-correct local offset for offset-less EXIF dates [ROUTINE] <!-- id:b045 -->
+- [x] Per-photo DST-correct local offset for offset-less EXIF dates [ROUTINE] <!-- id:b045 -->
   - **Why**: 33e5 shipped the assume-local-tz policy, but `_exif_date_to_iso`
     resolves the offset from `datetime.now().astimezone().tzinfo` — i.e. the
     offset *at processing time*, not at the photo's capture date. A winter photo

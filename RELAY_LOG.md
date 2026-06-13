@@ -24,3 +24,11 @@ All 4 ROUTINE items done: PNG/TIFF/HEIC ingestion + tz-aware EXIF dates; 22/22 t
 ## 2026-06-13 15:09 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
 
 review 20260613-1450: audited b19c8e1 (docs-only owner decision) clean, 22/22 green; reopened 33e5 per-photo DST safeguard as id:b045; refreshed contract pointer v1→v2 + ARCHITECTURE D6 + README/TODO drift
+
+## 2026-06-13 — executor (claude-sonnet-4-6)
+
+Worked id:b045 — DST-correct per-photo local offset for offset-less EXIF dates.
+Added `_local_zoneinfo()` helper that resolves the system IANA zone via TZ env var or /etc/localtime symlink, then falls back to the pre-b045 fixed-offset behaviour.
+`_exif_date_to_iso` now uses the photo's own naive datetime with the ZoneInfo object (not `datetime.now()`) so a Jan capture gets +01:00 and Jul gets +02:00 under Europe/Zurich.
+Added `test_offset_less_exif_date_uses_dst_correct_local_offset` (roadmap:b045) pinning TZ=Europe/Zurich and asserting both offsets. 23/23 tests green, ruff clean.
+Friction: uv sync still fails in worktrees (../.. path); same workaround (main-checkout venv + PYTHONPATH=src).
