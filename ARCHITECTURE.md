@@ -56,9 +56,13 @@ scale, and correctness beats speed here.
 ### D6 — Date precedence chain (settled, one known gap)
 `DateTimeOriginal` → `DateTimeDigitized` → `Image DateTime` → file mtime.
 Capture time beats digitization time beats file-system accident. mtime fallback
-is tz-aware (local zone); EXIF values are currently emitted naive, which fails
-core conformance — fix specced as roadmap:33e5 (use `OffsetTimeOriginal` family
-when present, else assume local zone, matching the mtime path).
+is tz-aware (local zone). EXIF dates are emitted tz-aware too (roadmap:33e5,
+done): the `OffsetTimeOriginal` family wins when present, else the wall-clock is
+assumed system-local and stamped tz-aware, so frontmatter passes core
+conformance. Known gap: the offset-less branch uses the *current* local offset
+rather than the offset the local zone had on the photo's own date, so DST is
+wrong for a capture ingested in the other season — per-photo zoneinfo fix
+specced as roadmap:b045 (mirrors zkm-scan aae8).
 
 ### D7 — GPS as raw decimal `"lat,lon"`, no reverse geocoding (settled)
 Signed decimal degrees, 6 dp (S/W hemispheres negative). Reverse geocoding

@@ -71,6 +71,29 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
     local-tz assumption is a judgment call — see REVIEW_ME.md before changing
     the policy.
 
+- [ ] Per-photo DST-correct local offset for offset-less EXIF dates [ROUTINE] <!-- id:b045 -->
+  - **Why**: 33e5 shipped the assume-local-tz policy, but `_exif_date_to_iso`
+    resolves the offset from `datetime.now().astimezone().tzinfo` — i.e. the
+    offset *at processing time*, not at the photo's capture date. A winter photo
+    ingested in summer is stamped `+02:00` instead of `+01:00`. Owner decision
+    2026-06-13 (was REVIEW_ME 33e5): keep the local-TZ default, but resolve the
+    offset from a named IANA zone applied to the photo's OWN date via `zoneinfo`,
+    so DST is correct per-photo. Mirrors the identical safeguard on zkm-scan aae8.
+  - **Acceptance**: offset-less EXIF dates attach the offset that the configured
+    IANA zone had **on that photo's date** (not the current offset). Resolve the
+    zone name from the system local zone (e.g. `Europe/Zurich`); apply it to the
+    parsed naive datetime with `ZoneInfo`. A Jan capture → `+01:00`, a Jul
+    capture → `+02:00` for `Europe/Zurich`. The Offset*-tag path (33e5) is
+    unchanged; conformance stays green. Travelling-photo mismatch stays an
+    accepted limitation until an Offset* tag or per-store tz is present.
+  - **Tests**: add a Jan-vs-Jul DST assertion to
+    `tests/test_timezone_conformance.py` (`# roadmap:b045`) — two offset-less
+    fixtures (or one fixture with two patched dates) asserting `+01:00` / `+02:00`
+    under a pinned `TZ=Europe/Zurich`. (currently RED)
+  - **Done-check**: `uv run pytest tests/test_timezone_conformance.py`
+  - **Context**: `_exif_date_to_iso` in `src/zkm_photo/convert.py` (line ~213,
+    the `datetime.now(tz=UTC).astimezone().tzinfo` branch). ARCHITECTURE.md D6.
+
 ## Gated (Phase 3 — do not start before the gate opens)
 
 - [ ] Thumbnail generation for md bodies [HARD — strong model] <!-- id:8740 -->

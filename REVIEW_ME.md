@@ -3,19 +3,6 @@
 Judgment calls encoded in red tests — confirm or correct the interpretation.
 Max ~10 open boxes; the reviewer prunes resolved ones each review turn.
 
-- [ ] tests/test_timezone_conformance.py::test_exif_date_without_offset_gets_local_tz
-  (roadmap:33e5) — EXIF dates carry no timezone; when no Offset* tag exists the
-  test assumes the SYSTEM LOCAL timezone (matching the existing mtime-fallback
-  policy). Alternatives: a per-store configured tz, or staying naive (which
-  permanently fails core conformance). Wrong for photos taken while travelling.
-  → owner 2026-06-13 CONFIRMED with SAFEGUARD: local-TZ default accepted, but
-  resolve the offset from a named IANA zone applied to the photo's OWN date
-  (zoneinfo, not a fixed current offset) so DST is correct per-photo — a summer
-  capture gets the summer offset, a winter capture the winter one. Add a
-  Jan-vs-Jul DST assertion (Europe/Zurich → +01:00 / +02:00). Matches the
-  identical safeguard on zkm-scan aae8. Travelling-photo mismatch stays an
-  accepted limitation until an Offset* tag or per-store tz is present.
-
 - [ ] tests/test_formats.py::test_heic_ingested_with_mtime_fallback
   (roadmap:4514) — HEIC v1 is interpreted as "ingest with graceful EXIF
   degradation": the committed fixture is a placeholder ftyp box, so the unit
