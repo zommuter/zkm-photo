@@ -36,3 +36,7 @@ Friction: uv sync still fails in worktrees (../.. path); same workaround (main-c
 ## 2026-06-13 15:33 — executor (sonnet, relay-loop)
 
 feat(convert): DST-correct per-photo local offset for offset-less EXIF dates (id:b045) — 23/23 green
+
+## 2026-06-13 23:31 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+review zkm-photo: 1 commit audited clean (REVIEW_ME-only triage), 23 tests green, pruned 3 confirmed boxes, all 5 ROUTINE closed, routine_open=0
