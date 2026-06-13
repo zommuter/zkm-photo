@@ -1,5 +1,18 @@
 # Relay log <!-- merge=union; append-only — never edit or reorder past entries -->
 
+## 2026-06-13 — executor (claude-sonnet-4-6)
+
+Worked id:8643/62ea/4514/33e5 — all four ROUTINE items in one session.
+Format ingestion (8643/62ea/4514): added .png/.tif/.tiff/.heic to SUFFIXES;
+PNG gets IHDR dimension read via stdlib struct (no Pillow); TIFF uses existing
+exifread chain unchanged; HEIC graceful-degrades via the existing except-clause.
+Timezone dates (33e5): _exif_date_to_iso() now takes an optional offset arg;
+_parse_exif() reads paired OffsetTime* tags; without them, wall-clock is
+assumed system local tz so every emitted date passes conformance; both plugin.yaml
+copies gain a conformance block for `zkm test photo`. 22/22 tests green, ruff clean.
+Friction: uv sync fails in worktrees (../.. resolves outside the project tree);
+worked around by running pytest with the main-checkout venv + PYTHONPATH=src.
+
 ## 2026-06-12 22:03 — reviewer (claude-fable-5)
 
 Handoff: suite was UNCOLLECTABLE at HEAD (SB5 import + M2 config drift) — repaired pre-C1, plus green guards (S/W GPS, DateTimeDigitized fallback, corrupt EXIF). First CLAUDE.md + ARCHITECTURE.md (D1-D10 incl. flat inbox/photos deviation). ROADMAP 4 ROUTINE (8643 PNG, 62ea TIFF, 4514 HEIC, 33e5 tz-aware dates — naive EXIF dates fail core conformance) + 3 Phase-3-gated HARD (thumbnails, OCR, reverse-geocode). 8 red specs, 14 green; uv.lock now committed; @manual Gherkin; 5 REVIEW_ME (assume-local-tz policy is the big one).
