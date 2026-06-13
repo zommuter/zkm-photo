@@ -20,3 +20,7 @@ Handoff: suite was UNCOLLECTABLE at HEAD (SB5 import + M2 config drift) — repa
 ## 2026-06-13 10:14 — executor (sonnet, relay-loop)
 
 All 4 ROUTINE items done: PNG/TIFF/HEIC ingestion + tz-aware EXIF dates; 22/22 tests green
+
+## 2026-06-13 15:09 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+review 20260613-1450: audited b19c8e1 (docs-only owner decision) clean, 22/22 green; reopened 33e5 per-photo DST safeguard as id:b045; refreshed contract pointer v1→v2 + ARCHITECTURE D6 + README/TODO drift
