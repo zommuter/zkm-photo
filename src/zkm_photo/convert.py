@@ -1,6 +1,6 @@
-"""zkm-photo — import JPEG photos into the knowledge store.
+"""zkm-photo — import JPEG/PNG/TIFF/HEIC photos into the knowledge store.
 
-Walks PHOTO_SOURCE_DIR for .jpg/.jpeg files, parses EXIF, writes
+Walks PHOTO_SOURCE_DIR for image files, parses EXIF, writes
 frontmatter markdown under photos/YYYY/MM/, stores raw bytes in CAS,
 and registers an inbox symlink. Second run on the same source is a no-op.
 """
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import re
+import struct
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,7 +24,7 @@ from zkm.inbox import build_canonical_index, symlink_with_sidecar
 PLUGIN_NAME = "photo"
 PLUGIN_VERSION = "0.4.0"
 
-SUFFIXES = {".jpg", ".jpeg"}
+SUFFIXES = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".heic"}
 
 
 def convert(store_path: Path, config: dict, *, progress=None) -> list[Path]:
@@ -126,12 +127,19 @@ def _parse_exif(path: Path) -> dict:
         with path.open("rb") as fh:
             tags = exifread.process_file(fh, details=False)
     except Exception:
-        return result
+        tags = {}
 
-    # Date: "YYYY:MM:DD HH:MM:SS" → ISO 8601
-    for key in ("EXIF DateTimeOriginal", "EXIF DateTimeDigitized", "Image DateTime"):
-        if key in tags:
-            result["date"] = _exif_date_to_iso(str(tags[key]))
+    # Date: "YYYY:MM:DD HH:MM:SS" → ISO 8601 with timezone.
+    # Offset tags are matched to the DateTime tag that was used.
+    _date_offset_pairs = (
+        ("EXIF DateTimeOriginal", "EXIF OffsetTimeOriginal"),
+        ("EXIF DateTimeDigitized", "EXIF OffsetTimeDigitized"),
+        ("Image DateTime", "EXIF OffsetTime"),
+    )
+    for dt_key, off_key in _date_offset_pairs:
+        if dt_key in tags:
+            offset_str = str(tags[off_key]).strip() if off_key in tags else None
+            result["date"] = _exif_date_to_iso(str(tags[dt_key]), offset_str)
             break
 
     # Camera model
@@ -143,7 +151,7 @@ def _parse_exif(path: Path) -> dict:
     if loc:
         result["location"] = loc
 
-    # Dimensions
+    # Dimensions — EXIF tags first, then format-specific fallbacks
     for wkey in ("EXIF ExifImageWidth", "Image ImageWidth"):
         if wkey in tags:
             result["width"] = int(str(tags[wkey]))
@@ -153,15 +161,60 @@ def _parse_exif(path: Path) -> dict:
             result["height"] = int(str(tags[hkey]))
             break
 
+    # PNG: read IHDR chunk for dimensions when EXIF didn't supply them
+    if path.suffix.lower() == ".png" and ("width" not in result or "height" not in result):
+        dims = _png_ihdr_dimensions(path)
+        if dims:
+            result["width"], result["height"] = dims
+
     return result
 
 
-def _exif_date_to_iso(s: str) -> str:
-    """Convert "YYYY:MM:DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SS"."""
+def _png_ihdr_dimensions(path: Path) -> tuple[int, int] | None:
+    """Read width and height from a PNG IHDR chunk (stdlib struct, no Pillow).
+
+    PNG spec: 8-byte signature, then IHDR chunk: 4-byte length, 4-byte type
+    (b'IHDR'), 4-byte big-endian width, 4-byte big-endian height.
+    """
+    try:
+        with path.open("rb") as fh:
+            header = fh.read(24)
+        if len(header) < 24:
+            return None
+        # Bytes 0-7: PNG signature; 8-11: chunk length; 12-15: b'IHDR'
+        if header[12:16] != b"IHDR":
+            return None
+        width = struct.unpack(">I", header[16:20])[0]
+        height = struct.unpack(">I", header[20:24])[0]
+        return width, height
+    except Exception:
+        return None
+
+
+def _exif_date_to_iso(s: str, offset: str | None = None) -> str:
+    """Convert "YYYY:MM:DD HH:MM:SS" to a tz-aware ISO 8601 string.
+
+    If *offset* is provided (e.g. "+02:00"), it is appended directly.
+    Otherwise the wall-clock time is interpreted as the system local timezone
+    (same policy as _mtime_iso) so that the emitted date is always tz-aware.
+    """
     s = s.strip()
-    if len(s) >= 19 and s[4] == ":" and s[7] == ":":
-        return f"{s[0:4]}-{s[5:7]}-{s[8:10]}T{s[11:19]}"
-    return s
+    if not (len(s) >= 19 and s[4] == ":" and s[7] == ":"):
+        return s  # unrecognised format — return as-is
+    iso_base = f"{s[0:4]}-{s[5:7]}-{s[8:10]}T{s[11:19]}"
+    if offset:
+        return f"{iso_base}{offset}"
+    # No EXIF offset tag — interpret wall-clock as local time, attach local offset
+    try:
+        naive = datetime(
+            int(s[0:4]), int(s[5:7]), int(s[8:10]),
+            int(s[11:13]), int(s[14:16]), int(s[17:19]),
+        )
+        local_tz = datetime.now(tz=UTC).astimezone().tzinfo
+        aware = naive.replace(tzinfo=local_tz)
+        return aware.isoformat(timespec="seconds")
+    except (ValueError, OverflowError):
+        return iso_base  # malformed — return without tz as last resort
 
 
 def _parse_gps(tags: dict) -> str | None:

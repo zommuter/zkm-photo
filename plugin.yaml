@@ -11,3 +11,7 @@ config:
   source_dir:
     required: true
     description: Directory to scan recursively for JPEG files (.jpg/.jpeg). Read-only.
+
+conformance:
+  config:
+    source_dir: tests/fixtures

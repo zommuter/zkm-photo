@@ -1,12 +1,12 @@
 # zkm-photo
 
-[zkm](https://github.com/zommuter/zkm) plugin that imports JPEG photos into the knowledge store. EXIF metadata (date, GPS, camera model, dimensions) is parsed into frontmatter; the original bytes go into the content-addressed store; a symlink lands in `inbox/photos/` for other plugins.
+[zkm](https://github.com/zommuter/zkm) plugin that imports photos into the knowledge store. EXIF metadata (date, GPS, camera model, dimensions) is parsed into frontmatter; the original bytes go into the content-addressed store; a symlink lands in `inbox/photos/` for other plugins.
 
 **Store dirs**: `photos/`, `originals/photos/`, `inbox/photos/`
 
 ## What it does
 
-For each `.jpg`/`.jpeg` file found under the configured `source_dir`:
+For each `.jpg`/`.jpeg`/`.png`/`.tif`/`.tiff`/`.heic` file found under the configured `source_dir`:
 
 1. Computes SHA-256; skips if already ingested (idempotent on re-run).
 2. Stores raw bytes in CAS at `originals/photos/_objects/<aa>/<rest>`.
@@ -17,7 +17,7 @@ For each `.jpg`/`.jpeg` file found under the configured `source_dir`:
 source: photo
 processor: photo
 processor_version: <plugin semver>
-date: 2024-08-15T12:30:00
+date: 2024-08-15T12:30:00+02:00  # tz-aware: EXIF OffsetTime* or system local tz
 tags: []                         # placeholder — future amenders may extend
 sha256: e5207343…
 original: originals/photos/_objects/e5/207343…
@@ -31,7 +31,7 @@ Body is a markdown image link pointing at the CAS object, plus a one-line EXIF s
 
 ## Scope (v0.1)
 
-- Formats: `.jpg` / `.jpeg` only
+- Formats: `.jpg` / `.jpeg` / `.png` (IHDR dimensions) / `.tif` / `.tiff` (TIFF EXIF) / `.heic` (graceful EXIF fallback)
 - EXIF library: `exifread` (pure-Python, no subprocess)
 - No thumbnail generation, no face detection, no OCR, no GPS reverse-geocoding (Phase 3)
 - `tags: []` left empty as amendment placeholder; `camera` scalar carries raw model string
