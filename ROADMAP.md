@@ -9,7 +9,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
 
 ## Items
 
-- [ ] Ingest PNG files (IHDR dimensions, mtime date fallback) [ROUTINE] <!-- id:8643 -->
+- [x] Ingest PNG files (IHDR dimensions, mtime date fallback) [ROUTINE] <!-- id:8643 -->
   - **Acceptance**: `.png` files in `source_dir` are ingested like JPEGs (md +
     CAS object + canonical inbox symlink + sha256 dedup). `width`/`height` come
     from the PNG IHDR chunk (stdlib `struct`, big-endian uint32 at byte offsets
@@ -24,7 +24,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
     per-format dimension fallback rather than special-casing inside the main
     loop. ARCHITECTURE.md D1/D2. Update README format list when done.
 
-- [ ] Ingest TIFF files (.tif/.tiff, native EXIF tags) [ROUTINE] <!-- id:62ea -->
+- [x] Ingest TIFF files (.tif/.tiff, native EXIF tags) [ROUTINE] <!-- id:62ea -->
   - **Acceptance**: `.tif`/`.tiff` files are ingested. exifread parses TIFF
     natively, so date (`Image DateTime` is step 3 of the existing fallback
     chain), camera (`Image Model`), and dimensions
@@ -37,7 +37,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
     `tests/fixtures/scan_2020.tif` (16×12, DateTime 2020:05:01 09:00:00,
     Model "HP ScanJet"). Update README format list when done.
 
-- [ ] Ingest HEIC files with graceful EXIF degradation [ROUTINE] <!-- id:4514 -->
+- [x] Ingest HEIC files with graceful EXIF degradation [ROUTINE] <!-- id:4514 -->
   - **Acceptance**: `.heic` files are ingested (md + CAS + symlink + dedup).
     EXIF is attempted via `_parse_exif` (exifread ≥3.5 has a HEIC box parser);
     any parse failure degrades to `{}` → mtime date, never a crash. The
@@ -50,7 +50,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
   - **Context**: `src/zkm_photo/convert.py` (`SUFFIXES`); judgment call logged
     in REVIEW_ME.md. Update README format list when done.
 
-- [ ] Emit timezone-aware ISO 8601 dates + pass core frontmatter conformance [ROUTINE] <!-- id:33e5 -->
+- [x] Emit timezone-aware ISO 8601 dates + pass core frontmatter conformance [ROUTINE] <!-- id:33e5 -->
   - **Acceptance**: (1) When EXIF carries `OffsetTimeOriginal` /
     `OffsetTimeDigitized` / `OffsetTime` (matched to whichever DateTime tag was
     used), the emitted `date` carries that offset, e.g.
