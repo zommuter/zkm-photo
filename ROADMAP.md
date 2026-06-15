@@ -95,12 +95,38 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
     the `datetime.now(tz=UTC).astimezone().tzinfo` branch). ARCHITECTURE.md D6.
 
 - [ ] Re-shard zkm-photo inbox from flat `inbox/photos/<name>` to core's
-  date-sharded `inbox/<subdir>/YYYY/MM/` layout (align with docs/object-storage.md
-  / zkm-eml) [ROUTINE] <!-- id:a112 -->
+  date-sharded `inbox/photos/YYYY/MM/<name>` layout (align with
+  docs/object-storage.md / zkm-eml) [ROUTINE] <!-- id:a112 -->
+  - **Acceptance**: the canonical inbox symlink for a photo dated YYYY-MM lands at
+    `inbox/photos/YYYY/MM/<filename>` (with its `.origin.json` sidecar beside it
+    in the same sharded dir), NOT flat under `inbox/photos/`. The date is the same
+    `date_prefix` already computed for the md path (`year`/`month` at
+    `convert.py:68`), so md (`photos/YYYY/MM/`) and inbox shards stay aligned.
+    Dedup and multi-producer behaviour are unchanged: a second run adds no
+    duplicate symlink; a JPEG already deposited by zkm-eml still gets one symlink
+    with a second `producers[]` entry. `build_canonical_index` must scan the
+    sharded tree (it already `rglob`s, so verify the `subdir` arg / index keying
+    still finds existing links across shards).
+  - **Tests**: `tests/test_convert.py::test_convert_inbox_is_date_sharded`
+    (`# roadmap:a112`) (currently RED). Also UPDATE the two existing flat-layout
+    assertions to expect the sharded path:
+    `::test_convert_canonical_inbox_symlink` (uses `inbox_photos.iterdir()` →
+    switch to `.rglob` + assert the `YYYY/MM` parent) and
+    `::test_convert_multi_producer_sidecar` (its `inbox_dir.iterdir()` symlink
+    count + the hand-built `link_dir`/`symlink_with_sidecar` call must target the
+    sharded subdir). Keep both green after the change.
+  - **Done-check**: `uv run pytest tests/test_convert.py -k "inbox or sidecar or canonical"`
   - **Context**: filed from REVIEW_ME D4 (user chose re-shard over acking the
-    deviation, 2026-06-15). zkm-photo currently creates FLAT `inbox/photos/<name>`
-    symlinks; core docs/object-storage.md and zkm-eml use date-sharded
-    `inbox/<subdir>/YYYY/MM/`.
+    deviation, 2026-06-15). `src/zkm_photo/convert.py` — `inbox_dir` (line 43),
+    `build_canonical_index(store_path, "inbox/photos")` (line 48), and the
+    `symlink_with_sidecar(link_dir=inbox_dir, ...)` call (line 73): route
+    `link_dir` through the per-photo `year`/`month`. Verify what date-sharding
+    `zkm.inbox.symlink_with_sidecar` / `build_canonical_index` support in core —
+    if the helper can't take a sharded `link_dir`, that's a core-side dependency:
+    record it in handback/REVIEW_ME rather than forking the helper. ARCHITECTURE.md
+    D4 (now marked "re-shard scheduled"); update README's `inbox/photos/` mentions
+    (lines 3/5/13) and the BDD `inbox/photos/` line in
+    `features/convert-photo.feature` when done.
 
 ## Gated (Phase 3 — do not start before the gate opens)
 

@@ -38,12 +38,15 @@ re-asserted here in `test_convert_multi_producer_sidecar`.
 **Rejected:** plugin-local copies of these helpers (the pre-object-storage
 pattern; drifted implementations were the motivation for the core library).
 
-### D4 — Flat `inbox/photos/<name>` symlinks (accepted deviation)
+### D4 — Inbox layout: flat → date-sharded (re-shard scheduled, id:a112)
 Core's object-storage doc shows date-sharded `inbox/<subdir>/YYYY/MM/` links
-(zkm-eml does this). zkm-photo links flat under `inbox/photos/` because photo
-filenames are user-meaningful and the md tree already date-shards. Dedup is
-unaffected (`build_canonical_index` rglobs). Revisit only if `inbox/photos/`
-grows past a few thousand entries; flagged in REVIEW_ME.md once for human ack.
+(zkm-eml does this). zkm-photo *currently* links flat under `inbox/photos/`
+because photo filenames are user-meaningful and the md tree already date-shards;
+dedup is unaffected (`build_canonical_index` rglobs). This was shipped as an
+accepted deviation pending one-time human ack. **Reverted 2026-06-15**: the owner
+chose to align with core rather than ack the deviation, so the flat layout is
+scheduled to move to date-sharded `inbox/photos/YYYY/MM/` — tracked as ROADMAP
+id:a112. Until that lands, the live tree is still flat.
 
 ### D5 — Dedup by rescanning md frontmatter, no state file (settled)
 `_scan_existing_shas` reads `sha256:` from every `photos/**/*.md` at startup.
