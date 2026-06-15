@@ -94,6 +94,14 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
   - **Context**: `_exif_date_to_iso` in `src/zkm_photo/convert.py` (line ~213,
     the `datetime.now(tz=UTC).astimezone().tzinfo` branch). ARCHITECTURE.md D6.
 
+- [ ] Re-shard zkm-photo inbox from flat `inbox/photos/<name>` to core's
+  date-sharded `inbox/<subdir>/YYYY/MM/` layout (align with docs/object-storage.md
+  / zkm-eml) [ROUTINE] <!-- id:a112 -->
+  - **Context**: filed from REVIEW_ME D4 (user chose re-shard over acking the
+    deviation, 2026-06-15). zkm-photo currently creates FLAT `inbox/photos/<name>`
+    symlinks; core docs/object-storage.md and zkm-eml use date-sharded
+    `inbox/<subdir>/YYYY/MM/`.
+
 ## Gated (Phase 3 — do not start before the gate opens)
 
 - [ ] Thumbnail generation for md bodies [HARD — strong model] <!-- id:8740 -->
