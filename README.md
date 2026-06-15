@@ -10,7 +10,7 @@ For each `.jpg`/`.jpeg`/`.png`/`.tif`/`.tiff`/`.heic` file found under the confi
 
 1. Computes SHA-256; skips if already ingested (idempotent on re-run).
 2. Stores raw bytes in CAS at `originals/photos/_objects/<aa>/<rest>`.
-3. Creates/updates a canonical symlink at `inbox/photos/<filename>` with an `.origin.json` sidecar. Multi-producer aware: a JPEG already deposited by `zkm-eml` gets a second entry in `producers[]`, not a second symlink.
+3. Creates/updates a canonical symlink at `inbox/photos/YYYY/MM/<filename>` with an `.origin.json` sidecar in the same date-sharded directory. Multi-producer aware: a JPEG already deposited by `zkm-eml` gets a second entry in `producers[]`, not a second symlink.
 4. Writes `photos/YYYY/MM/<date>_<slug>.md` with frontmatter:
 
 ```yaml

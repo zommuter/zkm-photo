@@ -168,14 +168,17 @@ def test_convert_canonical_inbox_symlink(store, src):
     shutil.copy(CANON, src / "canon.jpg")
     convert(store, cfg(src))
     inbox_photos = store / "inbox" / "photos"
-    symlinks = [f for f in inbox_photos.iterdir() if f.is_symlink()]
+    # Symlinks are now date-sharded (roadmap:a112) — use rglob, not iterdir.
+    symlinks = [f for f in inbox_photos.rglob("*") if f.is_symlink()]
     assert len(symlinks) == 1
     link = symlinks[0]
+    # Verify the YYYY/MM parent structure (CANON is dated 2024-08)
+    assert link.parent == inbox_photos / "2024" / "08"
     target = Path(os.readlink(link))
     resolved = (link.parent / target).resolve()
     assert resolved.exists()
-    # sidecar has producer entry
-    sidecar_path = inbox_photos / (link.name + ".origin.json")
+    # sidecar sits beside the symlink in the sharded dir
+    sidecar_path = link.parent / (link.name + ".origin.json")
     assert sidecar_path.exists()
     data = json.loads(sidecar_path.read_text())
     assert any(p["plugin"] == PLUGIN_NAME for p in data["producers"])
@@ -217,16 +220,18 @@ def test_convert_multi_producer_sidecar(store, src):
     from zkm.inbox import symlink_with_sidecar
 
     photo_bytes = CANON.read_bytes()
-    # Simulate zkm-eml depositing the same bytes into CAS and inbox/photos
+    # Simulate zkm-eml depositing the same bytes into CAS and inbox/photos.
+    # zkm-eml also uses date-sharded layout (roadmap:a112) — seed under YYYY/MM/.
     cas_obj = write_object(store, "originals/photos", photo_bytes)
     inbox_dir = store / "inbox" / "photos"
-    inbox_dir.mkdir(parents=True, exist_ok=True)
+    inbox_shard_dir = inbox_dir / "2024" / "08"  # CANON is dated 2024-08
+    inbox_shard_dir.mkdir(parents=True, exist_ok=True)
     index: dict = {}
     # eml uses the *email message* sha256, not the attachment sha256 — they differ.
     eml_sha256 = "a" * 64
     symlink_with_sidecar(
         cas_object=cas_obj,
-        link_dir=inbox_dir,
+        link_dir=inbox_shard_dir,
         link_name="canon_2024.jpg",
         producer={"plugin": "eml", "message": "mail/messages/2024-08-15_test.md", "sha256": eml_sha256},
         canonical_index=index,
@@ -246,7 +251,8 @@ def test_convert_multi_producer_sidecar(store, src):
     assert PLUGIN_NAME in plugins
 
     # Still only one symlink (canonical) and one CAS object
-    symlinks = [f for f in inbox_dir.iterdir() if f.is_symlink()]
+    # Symlinks are date-sharded (roadmap:a112) — use rglob.
+    symlinks = [f for f in inbox_dir.rglob("*") if f.is_symlink()]
     assert len(symlinks) == 1
     cas_files = list((store / "originals" / "photos" / "_objects").rglob("*"))
     assert sum(1 for f in cas_files if f.is_file()) == 1

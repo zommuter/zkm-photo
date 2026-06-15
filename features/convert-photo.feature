@@ -19,7 +19,7 @@ Feature: Import photos into the knowledge store
     And each frontmatter has source/date/tags/sha256/processor/processor_version
     And GPS photos carry "location" as signed decimal degrees
     And the original bytes live under originals/photos/_objects/
-    And inbox/photos/ holds one symlink per photo with an .origin.json sidecar
+    And inbox/photos/YYYY/MM/ holds one symlink per photo with an .origin.json sidecar beside it
     And the store git log shows one auto-commit scoped to the plugin's dirs
 
   Scenario: Re-run is a no-op
@@ -30,7 +30,7 @@ Feature: Import photos into the knowledge store
   Scenario: Photo shared with an email attachment gains a second producer
     Given a JPEG that was already ingested as a zkm-eml attachment
     When I run "zkm convert photo" over a directory containing the same JPEG
-    Then inbox/photos/ still has exactly one symlink for those bytes
+    Then inbox/photos/YYYY/MM/ still has exactly one symlink for those bytes
     And its .origin.json lists both "eml" and "photo" producers
 
   Scenario: Photos are searchable

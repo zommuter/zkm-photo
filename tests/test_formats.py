@@ -43,7 +43,8 @@ def test_png_ingested_with_ihdr_dimensions(store, src):
     assert post.metadata["original"].startswith("originals/photos/_objects/")
     cas_files = [f for f in (store / "originals" / "photos" / "_objects").rglob("*") if f.is_file()]
     assert len(cas_files) == 1
-    symlinks = [f for f in (store / "inbox" / "photos").iterdir() if f.is_symlink()]
+    # Symlinks are date-sharded (roadmap:a112) — use rglob.
+    symlinks = [f for f in (store / "inbox" / "photos").rglob("*") if f.is_symlink()]
     assert len(symlinks) == 1
 
 
