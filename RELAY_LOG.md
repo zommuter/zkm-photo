@@ -53,3 +53,7 @@ review zkm-photo 20260615-1104: 1 triage commit audited clean (no test/src chang
 
 Worked id:a112 — re-shard zkm-photo inbox from flat `inbox/photos/<name>` to date-sharded `inbox/photos/YYYY/MM/<name>`. Change: pass `inbox_dir / year / month` as `link_dir` to `symlink_with_sidecar` (core helper already supports arbitrary `link_dir` + calls `mkdir(parents=True)`; `build_canonical_index` already uses `rglob`). Updated 3 tests to use `rglob` instead of `iterdir` (test_convert_canonical_inbox_symlink, test_convert_multi_producer_sidecar, test_formats.py::test_png_ingested_with_ihdr_dimensions) and updated the multi-producer sidecar test to seed eml into the sharded dir. Updated README, feature file, ticked ROADMAP checkbox. 24/24 tests green, ruff clean.
 Friction: uv sync still fails in worktrees (../.. path resolves outside project tree); same workaround (main-checkout venv + PYTHONPATH pointing at worktree src).
+
+## 2026-06-15 18:51 — executor (sonnet, relay-loop)
+
+feat(convert): re-shard inbox/photos from flat to date-sharded YYYY/MM layout (id:a112) — 24/24 green
