@@ -40,3 +40,7 @@ feat(convert): DST-correct per-photo local offset for offset-less EXIF dates (id
 ## 2026-06-13 23:31 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
 
 review zkm-photo: 1 commit audited clean (REVIEW_ME-only triage), 23 tests green, pruned 3 confirmed boxes, all 5 ROUTINE closed, routine_open=0
+
+## 2026-06-15 11:04 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+review 20260615-1104: audited e9ce00e (REVIEW_ME/ROADMAP triage only — no test/src changes; test-integrity audit trivially clean: 0 deleted, 0 weakened). 23 tests green + ruff clean. Reverse-handoff (§5b): user-added ROADMAP id:a112 (re-shard flat inbox/photos → date-sharded inbox/photos/YYYY/MM/, filed from REVIEW_ME D4) was an unqualified [ROUTINE] — mini-handoff done REUSING id:a112: added acceptance/done-check/context + a red spec test (test_convert_inbox_is_date_sharded, # roadmap:a112, confirmed RED against the flat impl). Spec-drift: refreshed CLAUDE.md relay-contract pointer v2→v3 (fables-executor → /relay executor); marked ARCHITECTURE.md D4 "re-shard scheduled (id:a112)". TODO summary 0→1 ROUTINE open. routine_open=1.

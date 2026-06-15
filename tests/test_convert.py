@@ -181,6 +181,34 @@ def test_convert_canonical_inbox_symlink(store, src):
     assert any(p["plugin"] == PLUGIN_NAME for p in data["producers"])
 
 
+# ── 9b. Date-sharded inbox layout (roadmap:a112) ──────────────────────────────
+
+def test_convert_inbox_is_date_sharded(store, src):
+    # roadmap:a112 — re-shard flat inbox/photos/<name> to date-sharded
+    # inbox/photos/YYYY/MM/<name> aligning with core docs/object-storage.md +
+    # zkm-eml. CANON fixture is dated 2024-08, so the symlink must live under
+    # inbox/photos/2024/08/, not flat in inbox/photos/.
+    shutil.copy(CANON, src / "canon.jpg")
+    convert(store, cfg(src))
+    inbox_photos = store / "inbox" / "photos"
+    # No symlink directly under inbox/photos/ anymore — they are sharded.
+    flat_links = [f for f in inbox_photos.iterdir()
+                  if f.is_symlink()]
+    assert flat_links == [], (
+        "inbox symlinks must be date-sharded, not flat under inbox/photos/"
+    )
+    # Exactly one symlink, under YYYY/MM/ matching the photo's date (2024/08).
+    sharded = [f for f in inbox_photos.rglob("*") if f.is_symlink()]
+    assert len(sharded) == 1
+    link = sharded[0]
+    assert link.parent == inbox_photos / "2024" / "08"
+    # sidecar sits beside the symlink in the same sharded dir
+    assert (link.parent / (link.name + ".origin.json")).exists()
+    # dedup still holds on a second run (no duplicate symlink)
+    convert(store, cfg(src))
+    assert len([f for f in inbox_photos.rglob("*") if f.is_symlink()]) == 1
+
+
 # ── 10. Multi-producer sidecar ───────────────────────────────────────────────
 
 def test_convert_multi_producer_sidecar(store, src):

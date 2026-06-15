@@ -77,7 +77,7 @@ tests/
   a broad try/except so corrupt or unsupported EXIF degrades to `{}` (mtime
   date fallback) instead of crashing.
 
-## Relay contract <!-- fables-executor contract v2 -->
+## Relay contract <!-- relay-executor contract v3 -->
 
-This repo is managed by a reviewer/executor relay. Load the `fables-executor` skill
-(`/fables-executor`) before working on any item, then follow its rules exactly.
+This repo is managed by a reviewer/executor relay. Load `/relay executor` before
+working on any item, then follow its rules exactly.
