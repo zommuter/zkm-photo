@@ -94,7 +94,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
   - **Context**: `_exif_date_to_iso` in `src/zkm_photo/convert.py` (line ~213,
     the `datetime.now(tz=UTC).astimezone().tzinfo` branch). ARCHITECTURE.md D6.
 
-- [ ] Re-shard zkm-photo inbox from flat `inbox/photos/<name>` to core's
+- [x] Re-shard zkm-photo inbox from flat `inbox/photos/<name>` to core's
   date-sharded `inbox/photos/YYYY/MM/<name>` layout (align with
   docs/object-storage.md / zkm-eml) [ROUTINE] <!-- id:a112 -->
   - **Acceptance**: the canonical inbox symlink for a photo dated YYYY-MM lands at

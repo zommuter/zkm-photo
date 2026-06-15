@@ -70,9 +70,10 @@ def convert(store_path: Path, config: dict, *, progress=None) -> list[Path]:
         cas_obj = write_object(store_path, "originals/photos", photo_bytes)
         original_rel = str(cas_obj.relative_to(store_path))
 
+        inbox_shard_dir = inbox_dir / year / month
         symlink_with_sidecar(
             cas_object=cas_obj,
-            link_dir=inbox_dir,
+            link_dir=inbox_shard_dir,
             link_name=src_file.name.lower(),
             producer={"plugin": PLUGIN_NAME, "message": str(src_file), "sha256": sha},
             canonical_index=canonical_index,
