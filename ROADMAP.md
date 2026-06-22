@@ -130,7 +130,7 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
 
 ## Gated (Phase 3 — do not start before the gate opens)
 
-- [ ] Thumbnail generation for md bodies [HARD — strong model] <!-- id:8740 -->
+- [ ] Thumbnail generation for md bodies [HARD — meeting] <!-- id:8740 -->
   - **Why HARD**: gated on zkm Phase 3 (WebUI) — thumbnails only pay off with a
     rendering surface; needs an image-processing dep decision (Pillow runtime
     dep vs external tool) and a CAS-vs-derived-cache storage decision that
@@ -139,14 +139,14 @@ FULL suite green (`uv run pytest`) and `uv run ruff check` clean on touched file
   - **Acceptance**: deferred — re-scope when the Phase 3 gate (WebUI work
     started in zkm core) opens.
 
-- [ ] OCR text extraction for photographed documents [HARD — strong model] <!-- id:62cb -->
+- [ ] OCR text extraction for photographed documents [HARD — meeting] <!-- id:62cb -->
   - **Why HARD**: gated on zkm Phase 2.5+ amender infrastructure maturity — OCR
     output belongs in frontmatter/extraction-cache via the amendment contract
     (md body is single-producer), not in the converter; engine choice
     (tesseract subprocess vs ML) and quality gating are open design questions.
   - **Acceptance**: deferred — re-scope as an amender plugin item when picked up.
 
-- [ ] GPS reverse geocoding (place names from coordinates) [HARD — strong model] <!-- id:a711 -->
+- [ ] GPS reverse geocoding (place names from coordinates) [HARD — meeting] <!-- id:a711 -->
   - **Why HARD**: gated on Phase 3 — converters MUST NOT make network calls
     (plugin spec), so this needs either an offline dataset decision or a
     query-time/amender design; also interacts with the γ typed-slot entity
