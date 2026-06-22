@@ -57,3 +57,7 @@ Friction: uv sync still fails in worktrees (../.. path resolves outside project 
 ## 2026-06-15 18:51 — executor (sonnet, relay-loop)
 
 feat(convert): re-shard inbox/photos from flat to date-sharded YYYY/MM layout (id:a112) — 24/24 green
+
+## 2026-06-22 21:26 — maintenance (manual, uv.lock cascade)
+
+uv.lock cascade refresh to zkm 0.16.0 — mechanical version-pin only (id:bae5), audit-exempt class (no code/spec change).
