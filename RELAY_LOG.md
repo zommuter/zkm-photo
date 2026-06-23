@@ -61,3 +61,7 @@ feat(convert): re-shard inbox/photos from flat to date-sharded YYYY/MM layout (i
 ## 2026-06-22 21:26 — maintenance (manual, uv.lock cascade)
 
 uv.lock cascade refresh to zkm 0.16.0 — mechanical version-pin only (id:bae5), audit-exempt class (no code/spec change).
+
+## 2026-06-23 15:39 — reconcile (human)
+
+reconcile integrate: relay(review): refresh contract pointer v3->v4, sync stale TODO summary (a112 done)
