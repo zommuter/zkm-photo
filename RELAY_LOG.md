@@ -65,3 +65,7 @@ uv.lock cascade refresh to zkm 0.16.0 — mechanical version-pin only (id:bae5),
 ## 2026-06-23 15:39 — reconcile (human)
 
 reconcile integrate: relay(review): refresh contract pointer v3->v4, sync stale TODO summary (a112 done)
+
+## 2026-06-26 10:06 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+review: TODO-conformance prose-condense window clean (no code/test changes); gaming-scan + lints + relay-doctor per-repo clean; 6 ROUTINE done, 3 gated [HARD — meeting] open
