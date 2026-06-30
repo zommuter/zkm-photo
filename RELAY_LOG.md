@@ -69,3 +69,7 @@ reconcile integrate: relay(review): refresh contract pointer v3->v4, sync stale 
 ## 2026-06-26 10:06 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
 
 review: TODO-conformance prose-condense window clean (no code/test changes); gaming-scan + lints + relay-doctor per-repo clean; 6 ROUTINE done, 3 gated [HARD — meeting] open
+
+## 2026-06-30 12:15 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+Review: TODO-only window; resolved aaa3 (DST-safe EXIF) as already-shipped under b045, verified green (24 tests); refreshed contract pointer v4→v6; roadmap clean, 0 open ROUTINE. [id:aaa3,b045]
