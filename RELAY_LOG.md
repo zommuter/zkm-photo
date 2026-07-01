@@ -77,3 +77,7 @@ Review: TODO-only window; resolved aaa3 (DST-safe EXIF) as already-shipped under
 ## 2026-07-01 23:55 — reviewer (claude-fable-5, relay-loop)
 
 fable recheck clean (genuine Fable this time): 24/24 green, ruff clean, no gaming, b045 deep-audited genuine; 0 ROUTINE open (3 gated HARD-meeting); resolved REVIEW_ME box pruned — set fable_rechecked=2026-07-01 [id:b045,33e5,8643,62ea,4514,a112]
+
+## 2026-07-02 00:35 — reviewer (claude-fable-5, relay-loop)
+
+Review: dispatch was ckpt-anchor residue (tag 20260701-2355 anchored below the recheck's own 2 housekeeping commits — filed routed:37f0 to dotclaude-skills); window has no code/test changes, 24/24 green + ruff clean + gaming-scan clean, all 6 shipped ROUTINE ids re-confirmed genuine, roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting). ANCHOR THIS CKPT ON 2cdcc8d to absorb the residue. [id:8643,62ea,4514,33e5,b045,a112] [id:8643,62ea,4514,33e5,b045,a112]
