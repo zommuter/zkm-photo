@@ -81,3 +81,7 @@ fable recheck clean (genuine Fable this time): 24/24 green, ruff clean, no gamin
 ## 2026-07-02 00:35 — reviewer (claude-fable-5, relay-loop)
 
 Review: dispatch was ckpt-anchor residue (tag 20260701-2355 anchored below the recheck's own 2 housekeeping commits — filed routed:37f0 to dotclaude-skills); window has no code/test changes, 24/24 green + ruff clean + gaming-scan clean, all 6 shipped ROUTINE ids re-confirmed genuine, roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting). ANCHOR THIS CKPT ON 2cdcc8d to absorb the residue. [id:8643,62ea,4514,33e5,b045,a112] [id:8643,62ea,4514,33e5,b045,a112]
+
+## 2026-07-02 08:53 — reviewer (claude-fable-5, relay-loop)
+
+Review: spurious dispatch (classifier path-drop, twin of routed:3715/0537) — window holds only ckpt 0035's own RELAY_LOG commit; 24/24 green + ruff clean + gaming-scan clean + relay-doctor clean, 6 shipped ROUTINE ids re-confirmed genuine, roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting) [id:8643,62ea,4514,33e5,b045,a112]
