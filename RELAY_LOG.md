@@ -85,3 +85,7 @@ Review: dispatch was ckpt-anchor residue (tag 20260701-2355 anchored below the r
 ## 2026-07-02 08:53 — reviewer (claude-fable-5, relay-loop)
 
 Review: spurious dispatch (classifier path-drop, twin of routed:3715/0537) — window holds only ckpt 0035's own RELAY_LOG commit; 24/24 green + ruff clean + gaming-scan clean + relay-doctor clean, 6 shipped ROUTINE ids re-confirmed genuine, roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting) [id:8643,62ea,4514,33e5,b045,a112]
+
+## 2026-07-02 09:34 — reviewer (claude-fable-5, relay-loop)
+
+Review: ledger-only window (fb85 defang chore, routed:f5e1 class recurrence) — 24/24 green + ruff + gaming-scan clean, 6 shipped ROUTINE ids re-confirmed genuine; fixed the one relay-doctor finding (fb85 lint-ok annotation, P4); roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting) [id:8643,62ea,4514,33e5,b045,a112,fb85] [id:8643,62ea,4514,33e5,b045,a112,fb85]
