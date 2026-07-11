@@ -89,3 +89,7 @@ Review: spurious dispatch (classifier path-drop, twin of routed:3715/0537) — w
 ## 2026-07-02 09:34 — reviewer (claude-fable-5, relay-loop)
 
 Review: ledger-only window (fb85 defang chore, routed:f5e1 class recurrence) — 24/24 green + ruff + gaming-scan clean, 6 shipped ROUTINE ids re-confirmed genuine; fixed the one relay-doctor finding (fb85 lint-ok annotation, P4); roadmap unchanged, 0 ROUTINE open (3 gated HARD-meeting) [id:8643,62ea,4514,33e5,b045,a112,fb85] [id:8643,62ea,4514,33e5,b045,a112,fb85]
+
+## 2026-07-11 13:38 — reviewer (claude-opus-4-8, fable-standin, relay-loop)
+
+Review: ledger-only window (twin-safe archive + tag-first lane migration [HARD→INPUT — meeting]); 24/24 green, gaming-scan/ruff/roadmap-lint/cross-ledger/conformance all clean; synced stale TODO summary lane tag; 0 ROUTINE open (3 gated INPUT — meeting) [id:fb85,8643,62ea,4514,33e5,b045,a112]
