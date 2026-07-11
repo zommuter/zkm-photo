@@ -4,4 +4,4 @@ This is the work ledger for zkm-photo (Option B, decided 2026-06-30 — `~/src/z
 
 ## Current
 
-- Relay: 3 open ROADMAP items (all gated [HARD — meeting], Phase 3); 6 ROUTINE done <!-- id:fb85 --> <!-- lint-ok: relay status summary (P4 forward-flag note, defanged 2026-07-02) -->
+- Relay: 3 open ROADMAP items (all gated [INPUT — meeting], Phase 3); 6 ROUTINE done <!-- id:fb85 --> <!-- lint-ok: relay status summary (P4 forward-flag note, defanged 2026-07-02) -->
